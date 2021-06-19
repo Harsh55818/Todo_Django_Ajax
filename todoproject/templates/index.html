@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block css %}
+    *{ margin:0; padding:0; }
+    #bd h1{color:blue; text-align:center; border-bottom-style: dotted;}
+    #body_container{margin-top:10px; display:flex; align-items:center; justify-content: center;}
+    #create{
+        background:green;
+        color:white;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border-radius: 0.2rem;
+        cursor:pointer;
+    }
+    .edit{
+        background-color: #ffc107;
+        color:white;
+        border-color: #ffc107;
+        border:solid black;
+        padding: 5px 5px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 10px;
+        cursor: pointer;
+    }
+    .delete{
+        background-color: #dc3545;
+        color:white;
+        border-color: #ffc107;
+        border:solid black;
+        padding: 5px 5px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 10px;
+        cursor: pointer;
+    }
+    #fields{margin:20px 20px 20px 0;}
+    table, th, td { border: 1px solid black; padding: 5px; }
+    table {border-spacing: 15px;}
+
+
+{% endblock css %}
+
+
+
+
+{% block container %}
+    <form>{% csrf_token %}
+        <div id="fields">
+            <label>Name: </label>&nbsp;&nbsp;
+            <input type="text" id="nameid">
+            <br><br><br>
+            <label>Marks: </label>&nbsp;
+            <input type="number" id="marksid">
+            <br><br><br>
+            <button id="create" type="button">Create</button>
+        </div>
+    </form>
+    <div id="show">
+
+    </div>
+{% endblock %}
+
+{% block js %}
+    $(document).ready(function(){
+        if($('#result') != null){
+            Read();
+        }
+
+        $('#create').on('click', function(){
+            $name = $('#nameid').val();
+            $marks = $('#marksid').val();
+
+            if($name == '' || $marks == ''){alert('Please Fill All the Fields');}
+            else{
+                $.ajax({
+                    url: '{% url 'create' %}',
+                    type: 'POST',
+                    data: {name : $name, marks: $marks, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                    success: function(){
+                        Read();
+                        $('#nameid').val('');
+                        $('#marksid').val('');
+                    }
+                })
+            }
+        })
+
+        $(document).on('click', '.delete', function () {
+            $id = $(this).attr('name');
+            $.ajax({
+                url: 'delete/' + $id,
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function () {
+                    Read();
+                    alert("Deleted!");
+                }
+            });
+        });
+
+        $(document).on('click', '.edit', function(){
+            $id = $(this).attr('name');
+            window.location = "edit/" + $id;
+        });
+
+        $(document).on('click', '#update', function(){
+            $name = $('#name').val();
+            $marks = $('#marks').val();
+
+            if ($name == "" || $marks == "") {
+                alert("Please complete the required field");
+            } else {
+                $id = $('#usr_id').val();
+                $.ajax({
+                    url: 'update/' + $id,
+                    type: 'POST',
+                    data: {
+                        name: $name,
+                        marks: $marks,
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function () {
+                        window.location = '/';
+                        alert('Updated!');
+                    }
+                });
+            }
+        });
+    })
+
+
+function Read(){
+    $.ajax({
+        url: 'show/',
+        type: 'POST',
+        data: {csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+        success: function(response){
+            $('#show').html(response);
+        }
+    })
+}
+{% endblock %}

@@ -1,0 +1,25 @@
+<form id="table_form">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Marks</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>{% for items in usr %}
+            <tr>
+                <td>{{items.id}}</td>
+                <td>{{items.name}}</td>
+                <td>{{items.marks}}</td>
+                <td>
+                    <center>
+                        <a class="edit" name="{{items.id}}">Edit</a>
+                        <a class="delete" name="{{items.id}}">Delete </a>
+                    </center><br>
+                </td>{% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</form>
